@@ -1,0 +1,10 @@
+- name: Restore de permisos y atributos
+  hosts: all
+  gather_facts: true
+  
+  vars_files: inventory/group_vars/linux.yaml
+
+  tasks:
+    - name: Ejecutar el role de Restore
+      ansible.builtin.include_role:
+        name: restore

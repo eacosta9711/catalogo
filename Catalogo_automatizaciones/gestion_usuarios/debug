@@ -1,0 +1,9 @@
+TASK [usuarios : Crear usuario en Linux] ************************************************************************
+[DEPRECATION WARNING]: Encryption using the Python crypt module is deprecated. The Python crypt module is 
+deprecated and will be removed from Python 3.13. Install the passlib library for continued encryption 
+functionality. This feature will be removed in version 2.17. Deprecation warnings can be disabled by setting 
+deprecation_warnings=False in ansible.cfg.
+failed: [rocky] (item={'name': 'usuario1', 'action': 'create', 'password': 'pasword9711'}) => {"ansible_loop_var": "item", "changed": false, "item": {"action": "create", "name": "usuario1", "password": "pasword9711"}, "msg": "useradd: invalid user name '{'name': 'usuario1', 'action': 'create', 'password': 'pasword9711'}': use --badname to ignore\n", "name": "{'name': 'usuario1', 'action': 'create', 'password': 'pasword9711'}", "rc": 3}
+
+
+"msg": "Unsupported parameters for (ansible.builtin.user) module: expiredate. Supported parameters include: append, authorization, comment, create_home, expires, force, generate_ssh_key, group, groups, hidden, home, local, login_class, move_home, name, non_unique, password, password_expire_max, password_expire_min, password_lock, profile, remove, role, seuser, shell, skeleton, ssh_key_bits, ssh_key_comment, ssh_key_file, ssh_key_passphrase, ssh_key_type, state, system, uid, umask, update_password (createhome, user)."

@@ -1,0 +1,13 @@
+- name: Crear directorio de backup si no existe
+  ansible.builtin.win_file:
+    path: "{{ directorio_backup_win }}"
+    state: directory
+
+- name: Backup de permisos con icacls
+  ansible.windows.win_shell: |
+   icacls "{{ rutas_a_respaldar_win }}" /save "{{ directorio_backup_win }}\\permisos_backup.txt" /t /c
+  register: icacls_output
+
+- name: Mostrar salida de icacls
+  ansible.builtin.debug:
+    msg: "{{ icacls_output.stdout_lines }}"

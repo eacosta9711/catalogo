@@ -1,0 +1,59 @@
+---
+- name: Garantizar que exista la carpeta de backup en el nodo de control
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ directorio_backup }}"
+    state: directory
+    mode: '0777'
+  become: true
+
+- name: Garantizar que existan las carpetas de origen en el host administrado
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ rutas_a_respaldar }}"
+
+- name: Realizar backup de ACLs de carpetas
+  ansible.builtin.command:
+    cmd: "getfacl -R {{ item }}"
+  register: acl_output
+  loop: "{{ rutas_a_respaldar }}"
+  changed_when: false
+
+- name: Guardar backup de ACLs en archivos temporales
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "/tmp/{{ item.item | basename }}.acl"
+  loop: "{{ acl_output.results }}"
+  when: item.stdout is defined
+
+- name: Realizar backup de atributos extendidos de carpetas
+  ansible.builtin.command:
+    cmd: "attr -Rl {{ item }}"
+  register: attr_output
+  loop: "{{ rutas_a_respaldar }}"
+  changed_when: false
+
+- name: Guardar backup de atributos extendidos en archivos temporales
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "/tmp/{{ item.item | basename }}.attr"
+  loop: "{{ attr_output.results }}"
+  when: item.stdout is defined
+ 
+- name: Transferir backups de ACLs a la máquina local
+  ansible.builtin.fetch:
+    src: "/tmp/{{ item | basename }}.acl"
+    dest: "{{ directorio_backup }}/"
+    flat: yes
+  loop: "{{ rutas_a_respaldar }}"
+  become: true
+ 
+- name: Transferir backups de atributos a la máquina local
+  ansible.builtin.fetch:
+    src: "/tmp/{{ item | basename }}.attr"
+    dest: "{{ directorio_backup }}/"
+    flat: yes
+  loop: "{{ rutas_a_respaldar }}"
+  become: true

@@ -1,0 +1,10 @@
+- name: Backup de permisos y atributos
+  hosts: all
+  gather_facts: true
+
+  vars_files: inventory/group_vars/linux.yaml
+  
+  tasks:
+    - name: Ejecutar rol de Backup
+      ansible.builtin.include_role:
+        name: backup

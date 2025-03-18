@@ -1,0 +1,12 @@
+---
+# tasks file for backup
+- name: Backup de permisos en Linux
+  ansible.builtin.include_tasks:
+    file: backup_linux.yaml
+  when: ansible_os_family in ["Debian", "RedHat"]
+  
+- name: Backup de permisos en Windows
+  ansible.builtin.include_tasks:
+    file: backup_windows.yaml
+  when: ansible_os_family == "Windows"
+    

@@ -1,0 +1,44 @@
+#Play para crear usuario
+- name: Crear usuario en Linux
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512', 'passlib') }}"
+    state: present
+  when: item.action == "create"
+  loop: "{{ users }}"
+  become: true
+
+#Play para eliminar usuario
+- name: Eliminar usuario en Linux
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: absent
+    remove: true
+  when: item.action == "delete"
+  loop: "{{ users }}"
+  become: true
+
+#Plays para bloquear completamente el usuario
+- name: Bloquear la contraseña del usuario en Linux
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    password_lock: yes
+  when: item.action == "lock"
+  loop: "{{ users }}"
+  become: true
+
+- name: Expirar la cuenta del usuaro en Linux
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    expires: 1
+  when: item.action == "lock"
+  loop: "{{ users }}"
+  become: true
+
+- name: Deshabilitar el shell del usuario
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: /sbin/nologin
+  when: item.action == "lock"
+  loop: "{{ users }}"
+  become: true

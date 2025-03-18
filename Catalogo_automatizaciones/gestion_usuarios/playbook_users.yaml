@@ -1,0 +1,10 @@
+- name: Gestion sobre usuarios
+  hosts: all
+  gather_facts: true
+
+  vars_files: inventory/group_vars/users.yaml
+
+  tasks:
+    - name: Incluir rol usuarios
+      ansible.builtin.include_role:
+        name: usuarios

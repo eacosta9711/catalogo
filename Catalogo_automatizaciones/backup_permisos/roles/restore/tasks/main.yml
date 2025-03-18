@@ -1,0 +1,12 @@
+---
+# tasks file for restore
+- name: Restore de permisos en Linux
+  ansible.builtin.include_tasks:
+    file: restore_linux.yaml
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Restore de permisos en Windows
+  ansible.builtin.include_tasks:
+    file: restore_windows.yaml
+  when: ansible_os_family == 'Windows'
+  

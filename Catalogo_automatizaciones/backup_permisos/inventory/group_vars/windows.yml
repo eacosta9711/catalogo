@@ -1,0 +1,10 @@
+directorio_backup_win: "C:\\backup" #Es donde se quiere guardar la copia (node control)
+rutas_a_respaldar_win: "C:\\Users\\ansible\\Desktop\\app" #Los datos que se quieren guardar (host administrado)
+
+ansible_host: 192.168.101.242
+ansible_user: ansible
+ansible_password: "Ajax2024*"
+ansible_connection: winrm
+ansible_port: 5985
+ansible_winrm_transport: ntlm
+ansible_winrm_scheme: http

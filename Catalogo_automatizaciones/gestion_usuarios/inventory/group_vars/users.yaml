@@ -1,0 +1,8 @@
+users:
+  - name: "usuario1"
+    action: "lock"   #Acciones: create, delete, lock
+    password: "pasword9711"  #Contraseña de prueba
+    uid: 1002
+    group: "developers"
+    comment: "Usuario de desarrollo"
+    shell: "/bin/bash"

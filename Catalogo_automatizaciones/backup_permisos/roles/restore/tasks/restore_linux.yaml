@@ -1,0 +1,24 @@
+- name: Verificar que existen los archivos de backup de ACLs
+  ansible.builtin.stat:
+    path: "{{ directorio_backup }}/{{ item | basename }}.acl"
+  register: acl_files
+  loop: "{{ rutas_a_respaldar }}"
+
+- name: Restaurar ACLs de carpetas
+  ansible.builtin.command:
+    cmd: "setfacl --restore={{ directorio_backup }}/{{ item.item | basename }}.acl"
+  loop: "{{ acl_files.results }}"
+  when: item.stat.exists
+  become: true
+
+- name: Verificar que existen los archivos de backup de atributos
+  ansible.builtin.stat:
+    path: "{{ directorio_backup }}/{{ item | basename }}.attr"
+  register: attr_files
+  loop: "{{ rutas_a_respaldar }}"
+
+- name: Restaurar atributos extendidos de carpetas
+  ansible.builtin.command:
+    cmd: "attr -R -s {{ directorio_backup }}/{{ item.item | basename }}.attr"
+  loop: "{{ attr_files.results }}"
+  when: item.stat.exists

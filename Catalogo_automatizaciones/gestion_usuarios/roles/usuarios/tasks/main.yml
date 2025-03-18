@@ -1,0 +1,9 @@
+---
+# tasks file for usuarios
+- name: administracion de usuarios Linux
+  ansible.builtin.include_tasks: users_linux.yaml
+  when: ansible_os_family in ["Debian", "RedHat"]
+
+- name: administracion de usuarios Windows
+  ansible.builtin.include_tasks: users_windows.yaml
+  when: ansible_os_family == "Windows"

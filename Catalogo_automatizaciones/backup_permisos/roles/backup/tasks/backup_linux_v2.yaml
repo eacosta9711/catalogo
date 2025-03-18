@@ -1,0 +1,46 @@
+- name: Crear directorio de backup si no existe
+  ansible.builtin.file:
+    path: "{{ directorio_destino }}"
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Garantizar que existan carpetas origen
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ directorio_origen }}"
+  register: creacion_carpeta_origen
+
+- name: Mostrar carpetas que no existen
+  ansible.builtin.debug:
+    msg: "La carpeta {{ item.item }} no existe"
+  loop: "{{ creacion_carpeta_origen.results }}"
+  when: not item.stat.exists
+
+- name: Backup de ACLs de carpetas
+  ansible.builtin.command:
+    cmd:  getfacl -R "{{ item }}"
+  loop: "{{ directorio_origen }}"
+  register: acl_output
+  ignore_errors: true
+
+- name: Guardar salida de ACLs en archivos
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "{{ directorio_destino }}/{{ item.item | basename }}.acl"
+  loop: "{{ acl_output.results }}"
+  when: item.stdout is defined
+
+- name: Backup de atributos de carpetas
+  ansible.builtin.command:
+    cmd: lsattr -R "{{ item }}"
+  loop: "{{ directorio_origen }}"
+  register: attr_output
+  ignore_errors: true
+
+- name: Guardar salida de atributos en archivos
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "{{ directorio_destino }}/{{ item.item | basename }}.attr"
+  loop: "{{ attr_output.results }}"
+  when: item.stdout is defined

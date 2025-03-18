@@ -1,0 +1,74 @@
+- name: Inicializar variable de permisos por carpeta
+  ansible.builtin.set_fact:
+    permisos_backup: {}
+
+- name: Mostrar contenido de permisos_backup
+  ansible.builtin.debug:
+    var: permisos_backup
+
+- name: Verificar si la carpeta tiene ACLs
+  ansible.builtin.command:
+    cmd: "getfacl -c {{ item }}"
+  register: acl_check
+  loop: "{{ rutas_a_respaldar }}"
+  changed_when: false
+  failed_when: false
+
+- name: Verificar si la carpeta tiene atributos extendidos
+  ansible.builtin.command:
+    cmd: "attr -Rl {{ item }}"
+  register: attr_check
+  loop: "{{ rutas_a_respaldar }}"
+  changed_when: false
+  failed_when: false
+
+- name: Verificar permisos tradicionales
+  ansible.builtin.command:
+    cmd: "stat -c '%a %U %G %n' {{ item }}"
+  register: stat_check
+  loop: "{{ rutas_a_respaldar }}"
+  changed_when: false
+
+- name: Guardar backup de permisos tradicionales
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "/tmp/{{ item.item | basename }}.perm"
+  loop: "{{ stat_check.results }}"
+
+- name: Guardar backup de ACLs si existen
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "/tmp/{{ item.item | basename }}.acl"
+  loop: "{{ acl_check.results }}"
+  when: item.stdout | length > 0
+
+- name: Guardar backup de atributos extendidos si existen
+  ansible.builtin.copy:
+    content: "{{ item.stdout }}"
+    dest: "/tmp/{{ item.item | basename }}.attr"
+  loop: "{{ attr_check.results }}"
+  when: item.stdout | length > 0
+
+- name: Transferir backups de permisos tradicionales
+  ansible.builtin.fetch:
+    src: "/tmp/{{ item | basename }}.perm"
+    dest: "{{ directorio_backup }}/"
+    flat: yes
+  loop: "{{ rutas_a_respaldar }}"
+  when: "'perm' in permisos_backup[item]"
+
+- name: Transferir backups de ACLs
+  ansible.builtin.fetch:
+    src: "/tmp/{{ item | basename }}.acl"
+    dest: "{{ directorio_backup }}/"
+    flat: yes
+  loop: "{{ rutas_a_respaldar }}"
+  when: "'acl' in permisos_backup[item]"
+
+- name: Transferir backups de atributos extendidos
+  ansible.builtin.fetch:
+    src: "/tmp/{{ item | basename }}.attr"
+    dest: "{{ directorio_backup }}/"
+    flat: yes
+  loop: "{{ rutas_a_respaldar }}"
+  when: "'attr' in permisos_backup[item]"

@@ -1,0 +1,20 @@
+- name: Crear usuario en Windows
+  ansible.windows.win_user:
+    name: "{{ item }}"
+    password: "{{ item.password }}"
+    state: present
+  when: item.action == "create"
+  loop: "{{ users }}"
+
+- name: Eliminar usuario en Windows
+  ansible.windows.win_user:
+    name: "{{ item }}"
+    state: absent
+  when: item.action == "delete"
+  loop: "{{ users }}"
+
+- name: Bloquear usuario en Windows
+  ansible.windows.win_shell: "net user {{ item.name }} /active:no"
+  when: item.action == "lock"
+  loop: "{{ users }}"
+    

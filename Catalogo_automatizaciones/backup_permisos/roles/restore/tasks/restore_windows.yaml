@@ -1,0 +1,5 @@
+- name: Restaurar permisos con icacls
+  ansible.builtin.win_command: "icals {{ item }} /restore {{ backup_directory }}\\{{ item | basename }}.acl"
+  loop: "{{ source_directory }}"
+  ignore_errors: true
+  

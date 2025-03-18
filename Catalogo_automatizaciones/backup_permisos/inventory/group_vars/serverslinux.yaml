@@ -1,0 +1,10 @@
+---
+directorio_backup: "/backup/permisos" #Es donde se quiere guardar la copia (node control)
+rutas_a_respaldar: #Los datos que se quieren guardar (host administrado)
+  - "/prueba_backup"
+  - "/prueba_backup2"
+
+permisos_backup:
+  /prueba_backup: ["perm", "acl"]
+  /prueba_backup2: ["perm", "attr"]
+  
